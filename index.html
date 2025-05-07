@@ -6,77 +6,151 @@
     <title>VAV Monitoring System</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
+            padding: 0;
+            background-color: #f0f2f5;
+        }
+        .navbar {
+            background: #1a237e;
+            color: white;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .navbar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .nav-title {
+            font-size: 1.5rem;
+            margin: 0;
+        }
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .nav-links a:hover {
+            background-color: rgba(255,255,255,0.1);
         }
         .container {
             max-width: 1200px;
-            margin: 0 auto;
-        }
-        h1, h2 {
-            color: #333;
+            margin: 2rem auto;
+            padding: 0 20px;
         }
         .card {
             background: white;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             padding: 20px;
             margin-bottom: 20px;
+            transition: transform 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+        }
+        h1, h2 {
+            color: #1a237e;
+            margin-top: 0;
         }
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
+            background: white;
         }
         th, td {
-            padding: 10px;
+            padding: 12px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid #e0e0e0;
         }
         th {
-            background-color: #f2f2f2;
+            background-color: #f5f5f5;
+            font-weight: 600;
+            color: #1a237e;
+        }
+        tr:hover {
+            background-color: #f8f9fa;
         }
         .vav-unit {
             margin-top: 30px;
         }
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
         }
         input, select {
             width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
             box-sizing: border-box;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        input:focus, select:focus {
+            border-color: #2196F3;
+            outline: none;
         }
         button {
-            background-color: #4CAF50;
+            background-color: #2196F3;
             color: white;
-            padding: 10px 15px;
+            padding: 12px 20px;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s, transform 0.2s;
         }
         button:hover {
-            background-color: #45a049;
+            background-color: #1976D2;
+            transform: translateY(-1px);
         }
         .refresh-btn {
-            background-color: #2196F3;
+            background-color: #1a237e;
             margin-bottom: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
         .refresh-btn:hover {
-            background-color: #0b7dda;
+            background-color: #0d47a1;
+        }
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255,255,255,0.9);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            display: none;
         }
     </style>
 </head>
 <body>
+    <nav class="navbar">
+        <div class="navbar-content">
+            <h1 class="nav-title">VAV Monitoring System</h1>
+            <div class="nav-links">
+                <a href="index.html">Dashboard</a>
+                <a href="floor-plan.html">Floor Plan</a>
+            </div>
+        </div>
+    </nav>
+
     <div class="container">
         <h1>VAV Monitoring System</h1>
         
@@ -116,11 +190,17 @@
         </div>
     </div>
 
+    <div class="loading" id="loadingIndicator">
+        Updating data...
+    </div>
+
     <script>
         const API_BASE_URL = 'http://localhost:8000';
         
         // Fetch all VAV data
         async function fetchAllData() {
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            loadingIndicator.style.display = 'block';
             try {
                 // Fetch temperature setpoints
                 const tempSetpointsResponse = await fetch(`${API_BASE_URL}/temp-setpoints`);
@@ -134,7 +214,9 @@
                 
             } catch (error) {
                 console.error('Error fetching data:', error);
-                alert('Error fetching data. Check console for details.');
+                alert('Error fetching data. Please try again.');
+            } finally {
+                loadingIndicator.style.display = 'none';
             }
         }
         
